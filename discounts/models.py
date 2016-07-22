@@ -3,6 +3,7 @@ import datetime as dt
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.core.exceptions import ValidationError
 
 from discounts.consts.status import STATUS_PERIOD
 
@@ -13,6 +14,10 @@ class PeriodDate(models.Model):
 
     class Meta:
         abstract = True
+
+    def validate_date(self):
+        if self.date_start > self.date_end:
+            raise ValidationError(u'Дата начала не может быть старше даты окончания')
 
 
 class DateCreatedChanged(models.Model):
@@ -61,7 +66,43 @@ class Agreement(PeriodDate, DateCreatedChanged):
     def __unicode__(self):
         return u'%s|%s__%s' % (self.company, self.date_start, self.date_end)
 
+    def __validate_custom(self):
+        self.validate_date()
+
+    def clean(self):
+        self.__validate_custom()
+
+    def save(self, *args, **kwargs):
+        self.__validate_custom()
+        super(Agreement, self).save(*args, **kwargs)
+
 
 class Period(PeriodDate, DateCreatedChanged):
     agreement   = models.ForeignKey(Agreement)
-    status      = models.CharField(u'Провайдер', max_length=10, choices=STATUS_PERIOD)
+    status      = models.PositiveSmallIntegerField(u'статус', choices=STATUS_PERIOD, help_text=u'состояние периода')
+
+    def __unicode__(self):
+        return u'%s:%s|%s__%s' % (self.agreement, self.status, self.date_start, self.date_end)
+
+    def __validate_custom(self):
+        self.validate_date()
+        if self.agreement.date_start > self.date_start:
+            raise ValidationError(u'Дата начала периода старше даты начала соглашения %s' % self.agreement.date_start)
+        if  self.date_end > self.agreement.date_end:
+            raise ValidationError(u'Дата окончания периода старше даты окончания соглашения %s' % self.agreement.date_end)
+        periods = self.agreement.period_set.exclude(id=self.id) if self.id else self.agreement.period_set.all()
+        # for period in periods:
+        #     import ipdb;ipdb.set_trace()
+        #     if period.date_start >= self.date_start and self.date_end <= period.date_end:
+        #         print '1'*80
+        #         raise ValidationError(u'Пересекаются периоды %s' % period)
+        #     if period.date_start <= self.date_start and self.date_end >= period.date_end:
+        #         print '2'*80
+        #         raise ValidationError(u'Пересекаются периоды %s' % period)
+
+    def clean(self):
+        self.__validate_custom()
+
+    def save(self, *args, **kwargs):
+        self.__validate_custom()
+        super(Period, self).save(*args, **kwargs)

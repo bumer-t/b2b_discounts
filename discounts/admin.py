@@ -29,7 +29,7 @@ class AgreementAdmin(CommonAdmin):
 
 
 class PeriodAdmin(CommonAdmin):
-    list_display    = ('agreement', 'date_start', 'date_end', 'status')
+    list_display    = ('created', 'changed', 'agreement', 'date_start', 'date_end', 'status')
     list_filter     = ('status',)
     raw_id_fields   = ('agreement',)
 

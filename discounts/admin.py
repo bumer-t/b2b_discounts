@@ -33,6 +33,8 @@ class AgreementAdmin(CommonAdmin):
     list_display    = ('company', 'created', 'changed', 'negotiator', 'date_start', 'date_end', 'export_turnover',
                        'import_turnover')
     raw_id_fields   = ('company', 'negotiator',)
+    list_filter     = ('company', 'negotiator')
+    search_fields   = ['company__country__code', 'company__country__name']
     inlines         = [PeriodInline]
 
 

@@ -6,6 +6,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 
 from discounts.consts.status import STATUS_PERIOD
+from discounts.signals import set_mark_last_period
 
 
 class PeriodDate(models.Model):
@@ -76,10 +77,18 @@ class Agreement(PeriodDate, DateCreatedChanged):
         self.__validate_custom()
         super(Agreement, self).save(*args, **kwargs)
 
+    @property
+    def last_period(self):
+        for period in self.period_set.all():
+            if period.is_last:
+                return period
+        return None
+
 
 class Period(PeriodDate, DateCreatedChanged):
     agreement   = models.ForeignKey(Agreement)
     status      = models.PositiveSmallIntegerField(u'статус', choices=STATUS_PERIOD, help_text=u'состояние периода')
+    is_last     = models.BooleanField(default=False, blank=True)
 
     def __unicode__(self):
         return u'%s:%s|%s__%s' % (self.agreement, self.status, self.date_start, self.date_end)
@@ -108,3 +117,6 @@ class Period(PeriodDate, DateCreatedChanged):
     def save(self, *args, **kwargs):
         self.__validate_custom()
         super(Period, self).save(*args, **kwargs)
+
+
+models.signals.post_save.connect(set_mark_last_period, sender=Period)

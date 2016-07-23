@@ -30,11 +30,11 @@ class DateCreatedChanged(models.Model):
 
 
 class Country(DateCreatedChanged):
-    id   = models.CharField(u'Код iso', max_length=3, primary_key=True, db_index=True, unique=True)
-    name = models.CharField(u'Название', max_length=80, help_text=u'название страны')
+    code = models.CharField(u'Код iso', max_length=3, db_index=True, unique=True)
+    name = models.CharField(u'Название', max_length=80, help_text=u'название страны', unique=True)
 
     def __unicode__(self):
-        return unicode(self.id)
+        return unicode(self.code)
 
 
 class Company(DateCreatedChanged):

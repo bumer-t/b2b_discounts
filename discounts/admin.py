@@ -13,26 +13,34 @@ class NegotiatorAdmin(CommonAdmin):
 
 
 class CountryAdmin(CommonAdmin):
-    list_display    = ('id', 'name', 'created', 'changed')
-    search_fields   = ['id', 'name']
+    list_display    = ('code', 'name', 'created', 'changed')
+    search_fields   = ['code', 'name']
 
 
 class CompanyAdmin(CommonAdmin):
     list_display    = ('name', 'country', 'created', 'changed')
-    search_fields   = ['name', 'country__id']
+    search_fields   = ['name', 'country__code']
     raw_id_fields   = ('country',)
+
+
+class PeriodInline(admin.StackedInline):
+    model = Period
+    extra = 0
+    exclude = ('is_last',)
 
 
 class AgreementAdmin(CommonAdmin):
     list_display    = ('company', 'created', 'changed', 'negotiator', 'date_start', 'date_end', 'export_turnover',
                        'import_turnover')
     raw_id_fields   = ('company', 'negotiator',)
+    inlines         = [PeriodInline]
 
 
 class PeriodAdmin(CommonAdmin):
-    list_display    = ('created', 'changed', 'agreement', 'date_start', 'date_end', 'status')
-    list_filter     = ('status',)
+    list_display    = ('created', 'changed', 'agreement', 'date_start', 'date_end', 'status', 'is_last')
+    list_filter     = ('status', 'is_last',)
     raw_id_fields   = ('agreement',)
+    exclude         = ('is_last',)
 
 
 admin.site.register(Negotiator, NegotiatorAdmin)

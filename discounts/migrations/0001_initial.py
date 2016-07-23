@@ -10,17 +10,18 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'Country'
         db.create_table(u'discounts_country', (
-            ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2016, 7, 22, 0, 0), auto_now_add=True, null=True, blank=True)),
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2016, 7, 23, 0, 0), auto_now_add=True, null=True, blank=True)),
             ('changed', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, null=True, blank=True)),
-            ('id', self.gf('django.db.models.fields.CharField')(unique=True, max_length=3, primary_key=True, db_index=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=80)),
+            ('code', self.gf('django.db.models.fields.CharField')(default='qwe', unique=True, max_length=3, db_index=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=80)),
         ))
         db.send_create_signal(u'discounts', ['Country'])
 
         # Adding model 'Company'
         db.create_table(u'discounts_company', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2016, 7, 22, 0, 0), auto_now_add=True, null=True, blank=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2016, 7, 23, 0, 0), auto_now_add=True, null=True, blank=True)),
             ('changed', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, null=True, blank=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=80)),
             ('country', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['discounts.Country'])),
@@ -42,7 +43,7 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('date_start', self.gf('django.db.models.fields.DateField')()),
             ('date_end', self.gf('django.db.models.fields.DateField')()),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2016, 7, 22, 0, 0), auto_now_add=True, null=True, blank=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2016, 7, 23, 0, 0), auto_now_add=True, null=True, blank=True)),
             ('changed', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, null=True, blank=True)),
             ('company', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['discounts.Company'])),
             ('negotiator', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['discounts.Negotiator'])),
@@ -59,10 +60,11 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('date_start', self.gf('django.db.models.fields.DateField')()),
             ('date_end', self.gf('django.db.models.fields.DateField')()),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2016, 7, 22, 0, 0), auto_now_add=True, null=True, blank=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2016, 7, 23, 0, 0), auto_now_add=True, null=True, blank=True)),
             ('changed', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, null=True, blank=True)),
             ('agreement', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['discounts.Agreement'])),
-            ('status', self.gf('django.db.models.fields.CharField')(max_length=10)),
+            ('status', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
+            ('is_last', self.gf('django.db.models.fields.BooleanField')(default=False)),
         ))
         db.send_create_signal(u'discounts', ['Period'])
 
@@ -131,7 +133,7 @@ class Migration(SchemaMigration):
             'Meta': {'unique_together': "(('company', 'date_start', 'date_end'),)", 'object_name': 'Agreement'},
             'changed': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'null': 'True', 'blank': 'True'}),
             'company': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['discounts.Company']"}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 7, 22, 0, 0)', 'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 7, 23, 0, 0)', 'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
             'date_end': ('django.db.models.fields.DateField', [], {}),
             'date_start': ('django.db.models.fields.DateField', [], {}),
             'export_turnover': ('django.db.models.fields.FloatField', [], {'default': '0', 'blank': 'True'}),
@@ -143,16 +145,17 @@ class Migration(SchemaMigration):
             'Meta': {'unique_together': "(('name', 'country'),)", 'object_name': 'Company'},
             'changed': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'null': 'True', 'blank': 'True'}),
             'country': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['discounts.Country']"}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 7, 22, 0, 0)', 'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 7, 23, 0, 0)', 'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '80'})
         },
         u'discounts.country': {
             'Meta': {'object_name': 'Country'},
             'changed': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'null': 'True', 'blank': 'True'}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 7, 22, 0, 0)', 'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '3', 'primary_key': 'True', 'db_index': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '80'})
+            'code': ('django.db.models.fields.CharField', [], {'default': "'qwe'", 'unique': 'True', 'max_length': '3', 'db_index': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 7, 23, 0, 0)', 'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'})
         },
         u'discounts.negotiator': {
             'Meta': {'object_name': 'Negotiator', '_ormbases': [u'auth.User']},
@@ -163,11 +166,12 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Period'},
             'agreement': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['discounts.Agreement']"}),
             'changed': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'null': 'True', 'blank': 'True'}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 7, 22, 0, 0)', 'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 7, 23, 0, 0)', 'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
             'date_end': ('django.db.models.fields.DateField', [], {}),
             'date_start': ('django.db.models.fields.DateField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'status': ('django.db.models.fields.CharField', [], {'max_length': '10'})
+            'is_last': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'status': ('django.db.models.fields.PositiveSmallIntegerField', [], {})
         }
     }
 

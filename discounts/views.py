@@ -1,21 +1,31 @@
 # -*- coding: utf-8 -*-
 import json
 
-from discounts.tools import get_query
 from django.http.response import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.views.decorators.http import require_GET
+from django.shortcuts import render_to_response
+from django.template.context import RequestContext
 
 from discounts.consts.request_params import REQ_COUNTRY, REQ_COMPANY, REQ_NEGOTIATOR
+from discounts.decorators.request_decorators import api_view_500
 from discounts.forms import AgreementsCalendarForm
 from discounts.models import Agreement
+from discounts.tools import get_query
+
+
+def main_view(request):
+    params = {}
+    request_context = RequestContext(request)
+    response = render_to_response('index.html', params, context_instance=request_context)
+    return response
 
 
 @require_GET
+@api_view_500()
 @csrf_exempt
 def agreements_calendar(request):
-    result = {}
     input_data = request.GET.dict()
     form = AgreementsCalendarForm(input_data)
     if not form.is_valid():
@@ -30,8 +40,8 @@ def agreements_calendar(request):
     if cleaned_data.get(REQ_NEGOTIATOR):
         query &= get_query(REQ_NEGOTIATOR, cleaned_data)
 
+    result = {}
     agreements = Agreement.objects.prefetch_related('period_set').filter(query)
-    print agreements
     for agreement in agreements:
         last_period = agreement.last_period
         result.setdefault(last_period.date_end.year, [0]*12)

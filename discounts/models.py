@@ -84,6 +84,13 @@ class Period(PeriodDate, DateCreatedChanged):
     def __unicode__(self):
         return u'%s:%s|%s__%s' % (self.agreement, self.status, self.date_start, self.date_end)
 
+    def __is_validate_period(self, period):
+        if self.date_start > period.date_start and self.date_end > period.date_start and self.date_end > period.date_end:
+            return True
+        if self.date_start < period.date_start and self.date_end < period.date_start and self.date_end < period.date_end:
+            return True
+        return False
+
     def __validate_custom(self):
         self.validate_date()
         if self.agreement.date_start > self.date_start:
@@ -91,14 +98,9 @@ class Period(PeriodDate, DateCreatedChanged):
         if  self.date_end > self.agreement.date_end:
             raise ValidationError(u'Дата окончания периода старше даты окончания соглашения %s' % self.agreement.date_end)
         periods = self.agreement.period_set.exclude(id=self.id) if self.id else self.agreement.period_set.all()
-        # for period in periods:
-        #     import ipdb;ipdb.set_trace()
-        #     if period.date_start >= self.date_start and self.date_end <= period.date_end:
-        #         print '1'*80
-        #         raise ValidationError(u'Пересекаются периоды %s' % period)
-        #     if period.date_start <= self.date_start and self.date_end >= period.date_end:
-        #         print '2'*80
-        #         raise ValidationError(u'Пересекаются периоды %s' % period)
+        for period in periods:
+            if not self.__is_validate_period(period=period):
+                raise ValidationError(u'Пересекаются периоды %s' % period)
 
     def clean(self):
         self.__validate_custom()

@@ -15,8 +15,8 @@ def agreements_calendar(request):
     agreements = Agreement.objects.prefetch_related('period_set').filter(period__is_last=True)
     for agreement in agreements:
         last_period = agreement.last_period
-        result.setdefault(last_period.date_end.year, [0]*12).insert(last_period.date_end.month, 1)
-
+        result.setdefault(last_period.date_end.year, [0]*12)
+        result[last_period.date_end.year][last_period.date_end.month-1] += 1
     return HttpResponse(json.dumps(result), 'application/json')
 
 

@@ -24,7 +24,8 @@ class CompanyAdmin(CommonAdmin):
 
 
 class AgreementAdmin(CommonAdmin):
-    list_display    = ('company', 'date_start', 'date_end', 'negotiator', 'export_turnover', 'import_turnover')
+    list_display    = ('company', 'created', 'changed', 'negotiator', 'date_start', 'date_end', 'export_turnover',
+                       'import_turnover')
     raw_id_fields   = ('company', 'negotiator',)
 
 

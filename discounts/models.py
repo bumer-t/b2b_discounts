@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import datetime as dt
-
 from django.contrib.auth.models import User
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -22,8 +20,8 @@ class PeriodDate(models.Model):
 
 
 class DateCreatedChanged(models.Model):
-    created = models.DateTimeField(u'Дата создания', auto_now_add=True, null=True, default=dt.datetime.now())
-    changed = models.DateTimeField(u'Дата модификации', auto_now=True, null=True)
+    created = models.DateTimeField(u'Дата создания',  auto_now_add=True)
+    changed = models.DateTimeField(u'Дата модификации',  auto_now=True)
 
     class Meta:
         abstract = True

@@ -32,7 +32,7 @@ def agreements_calendar(request):
         return HttpResponse(json.dumps({'status': False, 'message': form.errors}), 'application/json')
 
     cleaned_data = form.cleaned_data
-    query = Q(period__is_last=True)
+    query = Q()
     if cleaned_data.get(REQ_COMPANY):
         query &= get_query(REQ_COMPANY, cleaned_data)
     if cleaned_data.get(REQ_COUNTRY):

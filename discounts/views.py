@@ -41,11 +41,10 @@ def agreements_calendar(request):
         query &= get_query(REQ_NEGOTIATOR, cleaned_data)
 
     result = {}
-    agreements = Agreement.objects.filter(query).annotate(p_date_end=Max('period__date_end'))
-    for agreement in agreements:
-        date_end = agreement.p_date_end
-        result.setdefault(date_end.year, [0]*12)
-        result[date_end.year][date_end.month-1] += 1
+    agreements_date_end = Agreement.objects.filter(query).annotate(p_date_end=Max('period__date_end')).values('p_date_end')
+    for date_end in agreements_date_end:
+        result.setdefault(date_end['p_date_end'].year, [0]*12)
+        result[date_end['p_date_end'].year][date_end['p_date_end'].month-1] += 1
     return HttpResponse(json.dumps(result), 'application/json')
 
 

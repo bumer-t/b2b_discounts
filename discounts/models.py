@@ -115,3 +115,4 @@ class Period(PeriodDate, DateCreatedChanged):
 
 
 models.signals.post_save.connect(set_mark_last_period, sender=Period)
+#todo if use is_last - need add post_delete

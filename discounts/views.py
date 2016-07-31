@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import json
+import datetime as dt
 
 from django.http.response import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Q
+from django.db import connection
+from django.db.models import Q, Count
 from django.views.decorators.http import require_GET
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
@@ -11,7 +12,7 @@ from django.template.context import RequestContext
 from discounts.consts.request_params import REQ_COUNTRY, REQ_COMPANY, REQ_NEGOTIATOR
 from discounts.decorators.request_decorators import api_view_500
 from discounts.forms import AgreementsCalendarForm
-from discounts.models import Agreement
+from discounts.models import Period
 from discounts.tools import get_query
 
 
@@ -24,7 +25,6 @@ def main_view(request):
 
 @require_GET
 @api_view_500()
-@csrf_exempt
 def agreements_calendar(request):
     input_data = request.GET.dict()
     form = AgreementsCalendarForm(input_data)
@@ -32,7 +32,7 @@ def agreements_calendar(request):
         return HttpResponse(json.dumps({'status': False, 'message': form.errors}), 'application/json')
 
     cleaned_data = form.cleaned_data
-    query = Q(period__is_last=True)
+    query = Q(is_last=True)
     if cleaned_data.get(REQ_COMPANY):
         query &= get_query(REQ_COMPANY, cleaned_data)
     if cleaned_data.get(REQ_COUNTRY):
@@ -41,17 +41,10 @@ def agreements_calendar(request):
         query &= get_query(REQ_NEGOTIATOR, cleaned_data)
 
     result = {}
-    agreements = Agreement.objects.prefetch_related('period_set').filter(query)
-    for agreement in agreements:
-        last_period = agreement.last_period
-        result.setdefault(last_period.date_end.year, [0]*12)
-        result[last_period.date_end.year][last_period.date_end.month-1] += 1
+    truncate_date = connection.ops.date_trunc_sql('month', '%s_%s.date_end' % (Period._meta.app_label.lower(), Period.__name__.lower()))
+    last_periods = Period.objects.select_related('agreement').filter(query).extra(select={'month': truncate_date}).values('month').annotate(Count('pk'))
+    for last_period in last_periods:
+        date_end = dt.datetime.strptime(last_period['month'], '%Y-%m-%d')
+        result.setdefault(date_end.year, [0]*12)
+        result[date_end.year][date_end.month-1] += last_period['pk__count']
     return HttpResponse(json.dumps(result), 'application/json')
-
-
-# from django.db import connection
-# from django.db.models import Sum, Count
-# truncate_date = connection.ops.date_trunc_sql('month', 'date_end')
-# qs = Period.objects.extra({'month':truncate_date})
-# report = qs.values('month').annotate(Count('pk')).order_by('month')
-# print report

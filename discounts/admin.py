@@ -40,7 +40,7 @@ class AgreementAdmin(CommonAdmin):
 
 class PeriodAdmin(CommonAdmin):
     list_display    = ('created', 'changed', 'agreement', 'date_start', 'date_end', 'status', 'is_last')
-    list_filter     = ('status', 'is_last',)
+    list_filter     = ('status', 'is_last', 'agreement__company')
     raw_id_fields   = ('agreement',)
     exclude         = ('is_last',)
 

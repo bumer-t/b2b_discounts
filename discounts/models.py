@@ -34,13 +34,17 @@ class Country(DateCreatedChanged):
     def __unicode__(self):
         return unicode(self.code)
 
+    class Meta:
+        verbose_name_plural = 'Country'
+
 
 class Company(DateCreatedChanged):
     name    = models.CharField(u'Название', max_length=80, help_text=u'название компании')
     country = models.ForeignKey(Country)
 
     class Meta:
-        unique_together = (('name', 'country'),)
+        unique_together     = (('name', 'country'),)
+        verbose_name_plural = 'Company'
 
     def __unicode__(self):
         return unicode(self.name)
@@ -74,13 +78,6 @@ class Agreement(PeriodDate, DateCreatedChanged):
     def save(self, *args, **kwargs):
         self.__validate_custom()
         super(Agreement, self).save(*args, **kwargs)
-
-    @property
-    def last_period(self):
-        for period in self.period_set.all():
-            if period.is_last:
-                return period
-        return None
 
 
 class Period(PeriodDate, DateCreatedChanged):

@@ -67,7 +67,7 @@ def agreements_calendar_by_is_last(request):
 
     result = {}
     truncate_date = connection.ops.date_trunc_sql('month', '%s_%s.date_end' % (Period._meta.app_label.lower(), Period.__name__.lower()))
-    last_periods = Period.objects.select_related('agreement').filter(query).extra(select={'month': truncate_date}).values('month').annotate(Count('pk'))
+    last_periods = Period.objects.filter(query).extra(select={'month': truncate_date}).values('month').annotate(Count('pk'))
     for last_period in last_periods:
         date_end = dt.datetime.strptime(last_period['month'], '%Y-%m-%d')
         result.setdefault(date_end.year, [0]*12)

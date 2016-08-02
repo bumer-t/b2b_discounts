@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-import json
-
 from discounts.consts.request_params import REQ_COUNTRY, REQ_COMPANY, REQ_NEGOTIATOR
 from django import forms
 from django.core.exceptions import ValidationError
 
 
 class AgreementsCalendarForm(forms.Form):
-    country             = forms.CharField(min_length=1, max_length=255, required=False, help_text=u'country')
-    negotiator         = forms.CharField(min_length=1, max_length=255, required=False, help_text=u'negotiator')
-    company             = forms.CharField(min_length=1, max_length=255, required=False, help_text=u'company')
+    country     = forms.CharField(min_length=1, max_length=255, required=False, help_text=u'country')
+    negotiator  = forms.CharField(min_length=1, max_length=255, required=False, help_text=u'negotiator')
+    company     = forms.CharField(min_length=1, max_length=255, required=False, help_text=u'company')
 
     def clean_country(self):
         return self.__clean_common(REQ_COUNTRY)
